@@ -1,13 +1,15 @@
+require("dotenv").config()
 const express = require("express")
 const mongoose = require("mongoose")
 const authRouter =require("./routes/authRoutes")
+const blogRouter = require("./routes/blogRoutes")
 const cors = require("cors")
 const passport = require("passport")
 require("./config/passport")
 
 
 
-const PORT = 3336
+const PORT = process.env.PORT || 3336
 
 const app = express()
 app.use(passport.initialize())
@@ -21,6 +23,7 @@ app.use((req,res,next)=>{
 
 
 app.use('/',  authRouter)
+app.use('/blogs',passport.authenticate("jwt",{session:false}),blogRouter)
 app.get('/protected',passport.authenticate("jwt",{session:false}),(req,res)=>{
     res.send({
         success:true,
