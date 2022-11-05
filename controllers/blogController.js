@@ -3,9 +3,9 @@ const moment = require("moment")
 
 
 exports.createBlog = async (req,res)=>{
-    
-    const user = await BlogModel.create({
-
+    console.log(req.user._id)
+    const user = await new BlogModel({
+       creator_id:req.user._id,
         created_at:moment().toDate(),
         title:req.body.title,
         description:req.body.description,

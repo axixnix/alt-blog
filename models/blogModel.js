@@ -4,6 +4,7 @@ const ObjectId = Schema.ObjectId;
 
 const blogSchema = new Schema({
     id: ObjectId,
+    creator_id:ObjectId,
     created_at:Date,
     title:{type:String,required:true},
     description:{type:String,required:true},
