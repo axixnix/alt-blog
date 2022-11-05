@@ -1,16 +1,16 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const authRouter =require("./routes/authRoutes")
-//const passport = require("passport")
 const cors = require("cors")
-//require("./passport")
+const passport = require("passport")
+require("./config/passport")
 
 
 
 const PORT = 3336
 
 const app = express()
-//app.use(passport.initialize())
+app.use(passport.initialize())
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cors())
@@ -21,6 +21,15 @@ app.use((req,res,next)=>{
 
 
 app.use('/',  authRouter)
+app.get('/protected',passport.authenticate("jwt",{session:false}),(req,res)=>{
+    res.send({
+        success:true,
+        user:{
+            id:req.user._id,
+            email:req.user.email
+        }
+    })
+})
 // home route
 app.get('/', (req, res) => {
     return res.json({ status: true })
