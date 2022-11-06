@@ -38,15 +38,15 @@ app.get('/published/:id',async (req,res)=>{
     
     const blog_id = req.params.id
     
-    const published = await blogModel.findById(blog_id)//('6366c3428542eb10ca760de7')
-    if(!published){
+    const blog = await blogModel.findById(blog_id)//('6366c3428542eb10ca760de7')
+    if(!blog){
        return res.send({
             success:false,
             message:`id:${blog_id} does not match any blog in our records, if you are sure it exists...it may have been deleted by the owner`,
         
         })
     }
-    if(published.state==="draft"){
+    if(blog.state==="draft"){
         return res.send({
             success:false,
             message:`user unauthorized to access this blog`,
@@ -55,10 +55,13 @@ app.get('/published/:id',async (req,res)=>{
 
     }
     
+     blog.read_count++
+     await blog.save()
+
     return res.send({
         success:true,
         message:"requested blog retrieved successfully",
-        blog:published
+        blog:blog
     })
 })
 app.get('/protected',passport.authenticate("jwt",{session:false}),(req,res)=>{
