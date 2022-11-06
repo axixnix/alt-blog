@@ -10,7 +10,7 @@ const blogController =require("../controllers/blogController")
 
 
 blogRouter.post("/create",blogController.createBlog)
-blogRouter.get("/published",blogController.getAPublishedBlog)
+//blogRouter.get("/published",blogController.getAPublishedBlog)
 
 
 

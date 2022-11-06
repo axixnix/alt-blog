@@ -26,10 +26,38 @@ app.use((req,res,next)=>{
 app.use('/',  authRouter)
 app.use('/blogs',passport.authenticate("jwt",{session:false}),blogRouter)
 app.get('/published',async (req,res)=>{
-    const published = await blogModel.find({state:"published"},{body:0})
+    const published = await blogModel.find({state:"published"},{body:0},{state:0})
     res.send({
         success:true,
         message:" published blogs retrieved successfully",
+        blog:published
+    })
+})
+
+app.get('/published/:id',async (req,res)=>{
+    
+    const blog_id = req.params.id
+    
+    const published = await blogModel.findById(blog_id)//('6366c3428542eb10ca760de7')
+    if(!published){
+       return res.send({
+            success:false,
+            message:`id:${blog_id} does not match any blog in our records, if you are sure it exists...it may have been deleted by the owner`,
+        
+        })
+    }
+    if(published.state==="draft"){
+        return res.send({
+            success:false,
+            message:`user unauthorized to access this blog`,
+        
+        })
+
+    }
+    
+    return res.send({
+        success:true,
+        message:"requested blog retrieved successfully",
         blog:published
     })
 })
