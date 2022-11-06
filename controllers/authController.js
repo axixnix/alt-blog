@@ -76,7 +76,8 @@ exports.login = async(req,res)=>{
           return res.status(200).send({
             success:true,
             message:"logged in successfuly",
-           //  u_id:u_id,
+            u_id:u_id,
+            name: user.first_name+' '+user.last_name,
             token:"Bearer " + token
         })
 

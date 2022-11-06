@@ -98,7 +98,7 @@ app.use('*', (req, res) => {
 })
 
 //db connection
-mongoose.connect("mongodb://127.0.0.1:27017/blog3")
+mongoose.connect(process.env.MONGO_URL)
 mongoose.connection.on("connected",()=>{
   console.log("mongodb connection successful")
 })
