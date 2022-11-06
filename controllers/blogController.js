@@ -1,5 +1,6 @@
 const BlogModel = require('../models/blogModel');
-const moment = require("moment")
+const moment = require("moment");
+//const { find } = require('../models/blogModel');
 
 
 exports.createBlog = async (req,res)=>{
@@ -20,7 +21,7 @@ exports.createBlog = async (req,res)=>{
     user.save().then(blog=>{
         res.send({
             success:true,
-            message:"blog created successfuly",
+            message:"blog created successfully",
             blog:blog
         })
     }).catch(err=>{
@@ -35,9 +36,14 @@ exports.createBlog = async (req,res)=>{
 
 }
 
-exports.getPublishedBlogs = async (req,res)=>{
-
-}
+/*exports.getPublishedBlogs = async (req,res)=>{
+    const published = await blogModel.find({state:"published"})
+    res.send({
+        success:true,
+        message:" published blogs retrieved successfully",
+        blog:published
+    })
+}*/
 
 exports.getUserBlogs = async (req,res)=>{
     

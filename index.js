@@ -6,6 +6,7 @@ const blogRouter = require("./routes/blogRoutes")
 const cors = require("cors")
 const passport = require("passport")
 require("./config/passport")
+const blogModel = require("./models/blogModel")
 
 
 
@@ -24,6 +25,14 @@ app.use((req,res,next)=>{
 
 app.use('/',  authRouter)
 app.use('/blogs',passport.authenticate("jwt",{session:false}),blogRouter)
+app.get('/published',async (req,res)=>{
+    const published = await blogModel.find({state:"published"},{body:0})
+    res.send({
+        success:true,
+        message:" published blogs retrieved successfully",
+        blog:published
+    })
+})
 app.get('/protected',passport.authenticate("jwt",{session:false}),(req,res)=>{
     res.send({
         success:true,
