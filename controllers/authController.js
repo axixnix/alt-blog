@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt")
 require('dotenv').config();
 
 exports.signup = async(req,res)=>{
-    const user = new UserModel({
+    const user = await UserModel.create({
         created_at:moment().toDate(),
     first_name:req.body.first_name,
     last_name:req.body.last_name,
@@ -35,7 +35,7 @@ exports.signup = async(req,res)=>{
 }
 
 exports.login = async(req,res)=>{
-     UserModel.findOne({email:req.body.email.toLowerCase()}).then(user=>{
+     const user = await UserModel.findOne({email:req.body.email.toLowerCase()}).then(user=>{
         if(!user){
             return res.status(401).send({
                 success:false,
@@ -60,7 +60,7 @@ exports.login = async(req,res)=>{
             })
 
         }
-
+         //console.log( UserModel.findOne({email:req.body.email},{first_name:0},{last_name:0},{created_at:0}))
         const payload={
             email:user.email,
             id:user._id
@@ -69,10 +69,14 @@ exports.login = async(req,res)=>{
         const token =jwt.sign({
             payload:payload
           },process.env.JWT_SECRET, { expiresIn: '1h' });
-          req.body.cid =user._id
+         // console.log("ori"+req.body.u_id)
+          const u_id =(String(user._id))
+          req.body.u_id = u_id
+          //console.log("moded"+req.body.u_id)
           return res.status(200).send({
             success:true,
             message:"logged in successfuly",
+           //  u_id:u_id,
             token:"Bearer " + token
         })
 

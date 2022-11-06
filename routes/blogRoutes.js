@@ -10,6 +10,15 @@ const blogController =require("../controllers/blogController")
 
 
 blogRouter.post("/create",blogController.createBlog)
+
+blogRouter.delete("/:id",blogController.deleteBlog)
+
+blogRouter.post("/mine/:id",blogController.getAllMyBlogs)
+
+blogRouter.get("/publish/:id",blogController.publishBlog)
+
+blogRouter.patch("/edit/:id",blogController.editBlog)
+
 //blogRouter.get("/published",blogController.getAPublishedBlog)
 
 
