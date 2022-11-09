@@ -4,7 +4,7 @@ const moment = require("moment");
 
 
 exports.createBlog = async (req,res)=>{
-    console.log(req.body.u_id)
+    console.log("blogmodel  "+req.params.u_id)
     const blog = await  BlogModel.create({
        creator_id:req.body.u_id,
         created_at:moment().toDate(),
@@ -87,15 +87,15 @@ exports.getAllMyBlogs = async (req,res)=>{
     }
 }
 
-exports.getAPublishedBlog = async (req,res)=>{
-
-}
+//exports.testRes = async (req,res)=>{
+//console.log(res.locals.userId)
+//}
 
 exports.publishBlog = async (req,res)=>{
     try{
-        const {id}=req.params
-        const user_id = req.user._id
-        const blog = await BlogModel.findOne({creator_id:user_id})
+        const id=req.params.id
+        const user_id = req.user.user_id
+        const blog = await BlogModel.findOne({_id:id})
         if(!blog){
             return res.send({
                 status:false,
@@ -117,17 +117,18 @@ exports.publishBlog = async (req,res)=>{
         return res.send({status:true,message:"blog publishing successful"})
 
     }catch(err){
+      res.send({sucess:false,
+    message:"unable to publish blog",
+    error:err
+    })
 
-    }
-
-}
+}}
 
 
 exports.deleteBlog = async (req, res) => {
     const { id } = req.params;
-    const user_id = req.user._id
-    const u_id=String(user_id)
-    check = await BlogModel.findById(id)
+    const user_id = req.user.user_id
+    check = await BlogModel.findById({_id:id})
     if(!check){
         return res.send({
             success:false,
@@ -136,15 +137,16 @@ exports.deleteBlog = async (req, res) => {
         })
     }
     
-    const b_id = String(check.creator_id)
-    console.log(b_id==u_id)
-    if(check && (b_id==u_id)){
-    const order = await BlogModel.deleteOne({ _id: id})
-    return res.json({ status: true, message:"blog has been deleted" })
+    const creator_id = check.creator_id
+    console.log(creator_id==user_id)
+    console.log("blog id from request  "+id)
+    if(check && (creator_id==user_id)){
+    const blog = await BlogModel.deleteOne({ _id: id})
+    return res.json({ status: true, message:"blog has been deleted",blog:blog })
     }
     if(check &&  !((check.creator_id===user_id))){
         
-        return res.json({ status: false, message:"unauthorized attempt to delete" })
+        return res.json({ status: false, message:"unauthorized" })
         }
     
 }

@@ -15,7 +15,7 @@ blogRouter.delete("/:id",blogController.deleteBlog)
 
 blogRouter.post("/mine/:id",blogController.getAllMyBlogs)
 
-blogRouter.get("/publish/:id",blogController.publishBlog)
+blogRouter.post("/publish/:id",blogController.publishBlog)
 
 blogRouter.patch("/edit/:id",blogController.editBlog)
 

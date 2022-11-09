@@ -14,7 +14,8 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
             return done(err, false);
         }
         if (user) {
-            
+            //res.locals.userId = jwt_payload.id
+            console.log("passport user :  "+jwt_payload.id)
             return done(null, user);
         } else {
             return done(null, false);

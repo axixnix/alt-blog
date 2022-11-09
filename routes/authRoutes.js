@@ -1,6 +1,7 @@
 const express = require("express")
 const authRouter = express.Router()
 const authController =require("../controllers/authController")
+const authController2 =require("../controllers/authController2")
 
 
 
@@ -9,9 +10,9 @@ const authController =require("../controllers/authController")
 
 
 
-authRouter.post("/signup",authController.signup)
+authRouter.post("/signup",authController2.signup)
 
-authRouter.post("/login",authController.login)
+authRouter.post("/login",authController2.login)
 
 
 
