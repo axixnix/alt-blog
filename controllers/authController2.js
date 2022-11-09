@@ -22,7 +22,7 @@ exports.signup = async (req,res)=>{
             res.json({status:'error',error:'password should be at least 6 characters'})
          }
 
-        const oldUser  = await User.findOne({email})
+        const oldUser  = await userModel.findOne({email})
 
         if(oldUser){
             return res.status(409).send("user already exists, login or try another username")
@@ -40,7 +40,7 @@ exports.signup = async (req,res)=>{
 
          SECRET = process.env.SECRET
 
-        const token =  jwt.sign({ email: user.email,user_id:user._id }, SECRET,{expiresIn:"2h"});
+        const token =  jwt.sign({ email: user.email,user_id:user._id }, SECRET,{expiresIn:"1h"});
 
         user.token = token
         //console.log(user)
@@ -68,7 +68,7 @@ exports.login = async (req,res)=>{
         { user_id: user._id, email },
         process.env.JWT_SECRET,
         {
-          expiresIn: "1h",
+          expiresIn: "1d",
         }
       );
 

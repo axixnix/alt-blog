@@ -1,17 +1,18 @@
 const BlogModel = require('../models/blogModel');
+const UserModel = require('../models/userModel');
 const moment = require("moment");
 //const { find } = require('../models/blogModel');
 
 
 exports.createBlog = async (req,res)=>{
-    console.log("blogmodel  "+req.params.u_id)
+    const user = await UserModel.findOne({_id:req.user.user_id})
     const blog = await  BlogModel.create({
-       creator_id:req.body.u_id,
+       creator_id:req.user.user_id,
         created_at:moment().toDate(),
         title:req.body.title,
         description:req.body.description,
         tags:req.body.tags,
-        author:req.user.first_name+" "+req.user.last_name,
+        author:user.first_name+" "+user.last_name,
         state:"draft",
         read_count:0,
         reading_time:`this is a ${req.body.reading_time} minute read`,
@@ -47,21 +48,35 @@ exports.getPublishedBlogs = async (req,res)=>{
 
 exports.getAllMyBlogs = async (req,res)=>{
     try{
-        const state = req.params.id
-        const user_id = req.body.id
+        const state = req.params.id2
+        const blog_id = String(req.params.id)
+        const user_id = req.user.user_id
         const Limit = req.body.limit|| 20
         const skip = req.body.skip || 0
+        const check = await BlogModel.find({_id:blog_id})
+        console.log("this is a check  "+check)
+        if(!check){return res.send({status:false,message:"blog not in record"})}
         if(state==1){
-            const blogs= await BlogModel.find({creator_id:user_id},{state:"published"}).limit(Limit).skip(skip)
-        return res.send({status:true,
-            message:"these are your published blogs",
-            blogs})
+            const blogs= await BlogModel.find({creator_id:user_id,state:"published"})//.limit(Limit).skip(skip)
+          console.log("exists?  "+blogs)
+            if(!blogs){
+            return res.send({status:false,message:"you have 0 published blogs"})
+          }else{
+            return res.send({status:true,
+                message:"these are your published blogs",
+                blogs:blogs})
+          }
+            
         }
 
         if(state==2){
-            const blogs= await BlogModel.find({creator_id:user_id},{state:"draft"}).limit(Limit).skip(skip)
-        return res.send({status:true,
-            message:"these are your blog drafts",blogs})
+            const blogs= await BlogModel.find({creator_id:user_id,state:"draft"}).limit(Limit).skip(skip)
+            if(!blogs){
+                return res.send({status:false,message:"you have 0  blogs in draft"})
+              }
+            return res.send({status:true,
+            message:"these are your blog drafts",
+            blogs:blogs})
         }
 
         if(state==0){
@@ -80,9 +95,10 @@ exports.getAllMyBlogs = async (req,res)=>{
         
 
     }
-    catch(err){
+    catch(err){console.log(err)
        return res.send({status:false,
         message:"encountered error while attempting to retrieve your blogs",
+        
     error:err})
     }
 }
