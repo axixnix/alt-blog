@@ -173,7 +173,7 @@ exports.getAPublishedBlog = async (req,res)=>{
 
 exports.deleteBlog = async (req, res) => {
     const  id  = req.params.id
-    const user_id = req.user.user_id
+    const user_id = req.user_id
     check = await BlogModel.findById(id)
     console.log(check)
     if(!check){
