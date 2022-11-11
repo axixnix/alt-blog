@@ -10,9 +10,9 @@ const authController2 =require("../controllers/authController2")
 
 
 
-authRouter.post("/signup",authController2.signup)
+authRouter.post("/signup",authController.signup)
 
-authRouter.post("/login",authController2.login)
+authRouter.post("/login",authController.login)
 
 
 

@@ -13,13 +13,15 @@ blogRouter.post("/create",blogController.createBlog)
 
 blogRouter.delete("/:id",blogController.deleteBlog)
 
-blogRouter.get("/mine/:id/:id2",blogController.getAllMyBlogs)
+blogRouter.post("/mine",blogController.getAllMyBlogs)
 
 blogRouter.post("/publish/:id",blogController.publishBlog)
 
 blogRouter.patch("/edit/:id",blogController.editBlog)
 
-//blogRouter.get("/published",blogController.getAPublishedBlog)
+blogRouter.post("/published",blogController.getPublishedBlogs)
+
+blogRouter.get("/published/:id",blogController.getAPublishedBlog)
 
 
 

@@ -35,6 +35,7 @@ exports.signup = async(req,res)=>{
 }
 
 exports.login = async(req,res)=>{
+    try{
       await UserModel.findOne({email:req.body.email.toLowerCase()}).then(user=>{//"email"
         if(!user){
             return res.status(401).send({
@@ -78,7 +79,12 @@ exports.login = async(req,res)=>{
         })
 
 
-     })
+     })}catch(err){
+        res.status(422).send({
+            message:"could not login user",
+            error:err
+        })
+     }
 
 }
 
@@ -93,7 +99,7 @@ exports.login2 = (req, res, { err, user, info}) => {
         async (error) => {
             if (error) return res.status(400).json(error)
 
-            const body = { _id: user._id, username: user.username };
+            const body = { password: user.password, email: user.email };
             //You store the id and username in the payload of the JWT. 
             // You then sign the token with a secret or key (JWT_SECRET), and send back the token to the user.
             // DO NOT STORE PASSWORDS IN THE JWT!

@@ -1,11 +1,12 @@
 const BlogModel = require('../models/blogModel');
 const UserModel = require('../models/userModel');
 const moment = require("moment");
+const  mongoose =require("mongoose")
 //const { find } = require('../models/blogModel');
 
 
 exports.createBlog = async (req,res)=>{
-    const user = await UserModel.findOne({_id:req.user.user_id})
+    const {user }= await UserModel.findOne({_id:req.user.user_id})
     const blog = await  BlogModel.create({
        creator_id:req.user.user_id,
         created_at:moment().toDate(),
@@ -36,72 +37,62 @@ exports.createBlog = async (req,res)=>{
 }
 
 exports.getPublishedBlogs = async (req,res)=>{
-    async (req,res)=>{
-        const published = await blogModel.find({state:"published"},{body:0})
+
+   try{
+    const Limit = req.body.limit || 20
+    const Skip = req.body.skip || 0
+    
+        const published = await BlogModel.find({state:"published"},{body:0}).limit(Limit).skip(Skip)
         res.send({
             success:true,
             message:" published blogs retrieved successfully",
             blog:published
         })
-    }
+   }catch(err){
+    res.send({
+        success:false,
+        message:" published blogs not retrieved successfully",
+        error:err
+    })
+   }
+    
 }
 
 exports.getAllMyBlogs = async (req,res)=>{
-    try{
-        const state = req.params.id2
-        const blog_id = String(req.params.id)
+    //const state = "pulished"//String(req.params)
+    
+    
+    
         const user_id = req.user.user_id
+        const {state} =req.body
+        console.log("this is user: "+user_id)
         const Limit = req.body.limit|| 20
         const skip = req.body.skip || 0
-        const check = await BlogModel.find({_id:blog_id})
-        console.log("this is a check  "+check)
-        if(!check){return res.send({status:false,message:"blog not in record"})}
-        if(state==1){
-            const blogs= await BlogModel.find({creator_id:user_id,state:"published"})//.limit(Limit).skip(skip)
-          console.log("exists?  "+blogs)
-            if(!blogs){
-            return res.send({status:false,message:"you have 0 published blogs"})
-          }else{
-            return res.send({status:true,
-                message:"these are your published blogs",
-                blogs:blogs})
-          }
+        console.log("this is state  "+state)
+
+        switch(state){
+            case "published"||"draft": const stated = await BlogModel.find({creator_id:user_id}).where("state").equals(state)
+            console.log(stated)
+             res.status(200).send({message:`here are your ${state} blogs `,blogs:stated})
+            break;
+            case {}: const unstated =await BlogModel.find({})
+            console.log(unstated)
+             res.status(200).send({message:`here are your  blogs `,blogs:unstated})
+            break;
+            default: return res.status(400).send({success:false,message:"error encountered could not retrieve your blogs"})
+        }
+         
+        
             
         }
-
-        if(state==2){
-            const blogs= await BlogModel.find({creator_id:user_id,state:"draft"}).limit(Limit).skip(skip)
-            if(!blogs){
-                return res.send({status:false,message:"you have 0  blogs in draft"})
-              }
-            return res.send({status:true,
-            message:"these are your blog drafts",
-            blogs:blogs})
-        }
-
-        if(state==0){
-            const blogs= await BlogModel.find({creator_id:user_id}).limit(Limit).skip(skip)
-        return res.send({status:true,
-            message:"these are all your blogs",
-            blogs})
-        }
-
-        if((state!=0)||(state!=1)||(state!=2)){
+            
+            
+      
         
-        return res.send({status:false,
-            message:"undefined state requested, check state parameter"
-            })
-        }
-        
+    
 
-    }
-    catch(err){console.log(err)
-       return res.send({status:false,
-        message:"encountered error while attempting to retrieve your blogs",
-        
-    error:err})
-    }
-}
+
+
 
 //exports.testRes = async (req,res)=>{
 //console.log(res.locals.userId)
@@ -140,11 +131,51 @@ exports.publishBlog = async (req,res)=>{
 
 }}
 
+exports.getAPublishedBlog = async (req,res)=>{
+    try{
+        const blog_id = req.params.id
+    
+    const blog = await BlogModel.findById(blog_id)//('6366c3428542eb10ca760de7')
+    if(!blog){
+       return res.send({
+            success:false,
+            message:`id:${blog_id} does not match any blog in our records`,
+        
+        })
+    }
+    if(blog.state==="draft"){
+        return res.send({
+            success:false,
+            message:`user unauthorized to access this blog`,
+        
+        })
+
+    }
+    
+     blog.read_count++
+     await blog.save()
+
+    return res.send({
+        success:true,
+        message:"requested blog retrieved successfully",
+        blog:blog
+    })
+    }catch(err){
+        res.send({status:false,
+            message:"encountered an error",
+        error:err})
+    }
+    
+}
+
+
+
 
 exports.deleteBlog = async (req, res) => {
-    const { id } = req.params;
+    const  id  = req.params.id
     const user_id = req.user.user_id
-    check = await BlogModel.findById({_id:id})
+    check = await BlogModel.findById(id)
+    console.log(check)
     if(!check){
         return res.send({
             success:false,

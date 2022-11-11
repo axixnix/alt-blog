@@ -3,6 +3,7 @@ const userModel = require('../models/userModel');
 const moment = require("moment")
 const bcrypt = require("bcrypt")
 
+
 require('dotenv').config();
 
 
@@ -10,19 +11,21 @@ exports.signup = async (req,res)=>{
     try{
         const{email,password} = req.body
 
-        if(!(email && password)){
+         if(!(email && password)){
             res.status(400).send("all fields are required")
-        }
+         }
 
-        if((typeof email) !== 'string'){
+        //const result = await authSchema.validateAsync(req.body)
+
+         if((typeof email) !== 'string'){
            res.json({status:'error',error:'invalid email'})
         }
 
         if((password.length < 6) ){
             res.json({status:'error',error:'password should be at least 6 characters'})
          }
-
-        const oldUser  = await userModel.findOne({email})
+ 
+        const oldUser  = await userModel.findOne({email:req.body.email})
 
         if(oldUser){
             return res.status(409).send("user already exists, login or try another username")
@@ -40,7 +43,7 @@ exports.signup = async (req,res)=>{
 
          SECRET = process.env.SECRET
 
-        const token =  jwt.sign({ email: user.email,user_id:user._id }, SECRET,{expiresIn:"1h"});
+        const token =  jwt.sign({ email: user.email,user_id:user._id }, process.env.JWT_SECRET,{expiresIn:"1d"});
 
         user.token = token
         //console.log(user)
@@ -48,6 +51,10 @@ exports.signup = async (req,res)=>{
 
         res.status(201).json(user.token)
     }catch(err){
+        if(err.isJoi===true ){res.status(422).send({
+            message:"one of your inputs does not meet our requirements",
+            error:err
+        })}
         console.log(err)
     }
 

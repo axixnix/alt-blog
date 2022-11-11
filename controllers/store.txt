@@ -1,0 +1,94 @@
+/* try{
+            if(state=="published"){
+                const {c1} =await BlogModel.find({creator_id:user_id}).where("state").equals("published")
+                console.log("c1   "+c1)
+                 if(!( c1))//exists({_id:blog_id})//.limit(Limit).skip(skip)
+                    { res.send({message:"no published"})}else{
+                        const blogs =await BlogModel.find({creator_id:user_id}).where("state").equals("published")
+                        res.status(200).send({message:"published",blogs:blogs})
+                    }
+
+            }if(state=="draft"){
+                const {c2} =await BlogModel.find({creator_id:user_id}).where("state").equals("draft")
+                console.log("c2  "+c2)
+          if(!( c2)) //exists({_id:blog_id})//.limit(Limit).skip(skip)
+          { res.status(400).send({message:"no drafts"})}else{
+              const blogs =await BlogModel.find({creator_id:user_id}).where("state").equals("draft")
+              res.status(200).send({message:"drafts",blogs:blogs})
+          }
+            }
+            if(!state){
+                const {c0} =await BlogModel.find({})
+                console.log("c0   "+c0)
+            if(!( c0)) //exists({_id:blog_id})//.limit(Limit).skip(skip)
+            { res.status(400).send({message:"you have 0 blogs"})}else{
+                const blogs =c0
+                res.status(200).send({message:"all blogs",blogs:blogs})
+
+ */
+       /* switch (state) {
+            case  1:const c1 =await BlogModel.find({creator_id:user_id}).where("state").equals("published")
+                 if(!( c1))//exists({_id:blog_id})//.limit(Limit).skip(skip)
+                    { res.status(400).send({message:"no published"})}else{
+                        const blogs =await BlogModel.find({creator_id:user_id}).where("state").equals("published")
+                        res.status(200).send({message:"published",blogs:blogs})
+                    }
+            
+
+          
+          break;
+          case  2:const c2 =await BlogModel.find({creator_id:user_id}).where("state").equals("draft")
+          if(!( c2)) //exists({_id:blog_id})//.limit(Limit).skip(skip)
+          { res.status(400).send({message:"no drafts"})}else{
+              const blogs =await BlogModel.find({creator_id:user_id}).where("state").equals("draft")
+              res.status(200).send({message:"drafts",blogs:blogs})
+          }
+            break;
+            
+            
+            case 0:const c0 =await BlogModel.find({})
+            if(!( c0)) //exists({_id:blog_id})//.limit(Limit).skip(skip)
+            { res.status(400).send({message:"you have 0 blogs"})}else{
+                const blogs =c0
+                res.status(200).send({message:"all blogs",blogs:blogs})
+            }
+            break;
+            
+            default: console.log("state"+state)
+            return res.status(400).send({status:false,
+            message:"undefined state requested, check state parameter"
+            })
+         }*/
+        
+
+        /*app.get('/published',async (req,res)=>{
+
+
+     try{
+        const Limit = req.body.limit || 5
+    const Skip = req.body.skip || 0
+    const blogs = await blogModel.find({state:"published"},{body:0}).limit(Limit).skip(Skip)
+    //const blogs = await blogModel.find({state:"published"}).limit(Limit).skip(Skip).projection({title:1,tags:1,author:1})
+    return res.json({ status: true,
+        message:" published blogs retrieved successfully",
+         blogs })
+    }catch(err){
+      console.log(err)
+    }
+    
+    
+})
+ */
+
+
+app.get('/protected',auth,(req,res)=>{//passport.authenticate("jwt",{session:false})
+    const {user} = req
+    console.log(user)
+    res.send({
+        success:true,
+        user:{
+            id:user.user_id,
+            email:user.email
+        }
+    })
+})
