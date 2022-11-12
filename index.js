@@ -7,8 +7,10 @@ const blogRouter = require("./routes/blogRoutes")
 const cors = require("cors")
 const morgan = require("morgan") 
 const ErrorHandler = require("./middleware/errorHandler")
-const passport = require("passport")
+const passport = require("passport");
+//const verifyToken = require("./config/auth");
 require("./config/passport")
+
 
 
 
@@ -35,9 +37,9 @@ app.get('/', (req, res) => {
 })
 
 //res.locals //check aggregate in mongodb
-app.get('/res',passport.authenticate("jwt",{session:false}), (req, res) => {
-    console.log("res middleware works  "+req.user._id)
-    return res.status(200).json(req.user._id)
+app.get('/res',auth, (req, res) => {
+    console.log("res middleware works  "+req.user.id)
+    return res.status(200).json(req.user.id)
    // console.log(req.body)
    // console.log({lel:req.user._id})
 })
