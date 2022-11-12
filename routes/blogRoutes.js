@@ -11,7 +11,7 @@ const blogController =require("../controllers/blogController")
 
 blogRouter.post("/create",blogController.createBlog)
 
-blogRouter.delete("/:id",blogController.deleteBlog)
+blogRouter.delete("/delete/:id",blogController.deleteBlog)
 
 blogRouter.post("/mine",blogController.getAllMyBlogs)
 

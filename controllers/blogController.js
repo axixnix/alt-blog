@@ -173,13 +173,13 @@ exports.getAPublishedBlog = async (req,res)=>{
 
 exports.deleteBlog = async (req, res) => {
     const  id  = req.params.id
-    const user_id = req.user_id
+    const user_id = req.user.id
     check = await BlogModel.findById(id)
     console.log(check)
     if(!check){
         return res.send({
             success:false,
-            message:`id:${blog_id} does not match any blog in our records`,
+            message:`id:${id} does not match any blog in our records`,
         
         })
     }
