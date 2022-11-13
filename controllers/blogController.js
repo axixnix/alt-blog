@@ -6,9 +6,17 @@ const  mongoose =require("mongoose")
 
 
 exports.createBlog = async (req,res)=>{
-    const {user }= await UserModel.findOne({_id:req.user.user_id})
-    const blog = await  BlogModel.create({
-       creator_id:req.user.user_id,
+    const user = await UserModel.findOne({_id:req.user.id}).then(data=>{
+                
+        count = data.length
+        return data
+    })
+    if(count==0||undefined){
+        
+        return res.status(400).send({message:"this action can only be performed by registered users"})}
+    console.log("blog creator user count "+count)
+        const blog = await  BlogModel.create({
+       creator_id:user._id,
         created_at:moment().toDate(),
         title:req.body.title,
         description:req.body.description,
@@ -58,78 +66,72 @@ exports.getPublishedBlogs = async (req,res)=>{
     
 }
 
-exports.getAllMyBlogs = async (req,res)=>{
-    //const state = "pulished"//String(req.params)
-    
-    
-    
-        const user_id = req.user.user_id
-        const {state} =req.body
-        console.log("this is user: "+user_id)
-        const Limit = req.body.limit|| 20
-        const skip = req.body.skip || 0
-        console.log("this is state  "+state)
+exports.getMyBlogs = async (req, res) =>{
+	try {
+		const user_id = req.user.id;
+		const { state } = req.query;
+        let count1
+        let count2
 
-        switch(state){
-            case "published"||"draft": const stated = await BlogModel.find({creator_id:user_id}).where("state").equals(state)
-            console.log(stated)
-             res.status(200).send({message:`here are your ${state} blogs `,blogs:stated})
-            break;
-            case {}: const unstated =await BlogModel.find({})
-            console.log(unstated)
-             res.status(200).send({message:`here are your  blogs `,blogs:unstated})
-            break;
-            default: return res.status(400).send({success:false,message:"error encountered could not retrieve your blogs"})
-        }
-         
-        
+		if (state) {
             
-        }
-            
-            
-      
-        
-    
+			const blogs = await BlogModel.find({ state:state, creator_id: user_id },{body:0}).then(data=>{
+                
+                count1 = data.length
+                return data
+            });
+            //console.log('blogs length     '+blogs)
+            console.log('blogs length     '+count1)
+            if(count1==0){return res.status(422).send({message:`you have no blogs in ${state} state`})}
+			return res.status(200).json({ status: true, blogs});
+		}
 
-
+		const blogs = await BlogModel.find({ creator_id: user_id },{body:0}).then(data=>{
+                
+            count2 = data.length
+            return data
+        });
+        if(count2==0){return res.status(422).send({message:`you have 0 blogs in record `})}
+		return res.status(200).json({ status: true, blogs });
+	} catch (err) {
+		res.send({ status: 500, errDesc: err, message: "An error occurred, please try again." });
+	}
+}
 
 
 //exports.testRes = async (req,res)=>{
 //console.log(res.locals.userId)
 //}
 
-exports.publishBlog = async (req,res)=>{
-    try{
-        const id=req.params.id
-        const user_id = req.user.user_id
-        const blog = await BlogModel.findOne({_id:id})
-        if(!blog){
-            return res.send({
-                status:false,
-                message:"id does not any blog in our records"
-            })
-        }
-        const b_id =String(blog.creator_id)
-        const u_id = String(user_id)
-        if(!(u_id==b_id)){
-            return res.send({status:false,
-            message:"you are not authorized to perform this action"})
-        }
-        if(blog.state=="published"){
-          return res.sen({status:false,message:"blog already published"})
-        }
+exports.updateState = async function publish(req, res, next) {
+	try {
+		const { blog_id } = req.params;
+		const user_id = req.user.id;
+		const body = req.body;
+		const blog = await BlogModel.findById(blog_id,{body:0});
 
-        blog.state ="published"
-        await blog.save()
-        return res.send({status:true,message:"blog publishing successful"})
+		if (!blog) {
+			return res.status(404).json({ status: false, message: `Can not find blog with ID: ${blog_id}` });
+		}
 
-    }catch(err){
-      res.send({sucess:false,
-    message:"unable to publish blog",
-    error:err
-    })
+		if (user_id !== blog.creator_id) {
+			return res.status(401).json({ status: false, message: "You are not authorized to edit this blog." });
+		}
+        if(body.state=="draft"||"published"){
+		blog.state = body.state;
+		blog
+			.save()
+			.then(() => res.status(200).json({ status: true, blog }))
+			.catch((err) => next({ status: 500, errDesc: err, message: err._message }));}else{
+                return res.status(422).send({
+                    message:"invalid state"
+                })
+            }
+	} catch (err) {
+		res.send({ status: 500, errDesc: err, message: "An error occurred, please try again later." });
+	}
+}
 
-}}
 
 exports.getAPublishedBlog = async (req,res)=>{
     try{
@@ -199,39 +201,41 @@ exports.deleteBlog = async (req, res) => {
 }
 
 
-exports.editBlog = async (req, res) => {
-    const { id } = req.params;
-    const options ={body:"",title:"",description:"",tags:""}
-    //const { state } = req.body;
+exports.editBlog = async function updateArticle(req, res) {
+	try {console.log("req.params.id :"+(req.params.blog_id))
+		const  blog_id  = req.params.blog_id;
+        console.log("blog_id :"+blog_id)
+		const user_id = req.user.id;
+		const { title, description, body, state, tags } = req.body;
+		const blog = await BlogModel.findById(blog_id);
 
-    const blog = await BlogModel.findById(id)
+		if (!blog) {
+			return res.status(404).json({ status: false, message: `Can not find blog with ID: ${blog_id}` });
+		}
 
-    if (!blog) {
-        return res.status(404).json({ status: false, message:"id does not match any blog in our  records" })
-    }
+		if (user_id !== blog.creator_id) {
+			return res.status(401).json({ status: false, message: "You are not authorized to edit this blog." });
+		}
+        //console.log("state frome destructuring :"+state)
+        if(!(title==undefined))
+		blog.title = title;
+        if(!(description==undefined))
+		blog.description = description;
+        if(!(body==undefined))
+		blog.body = body;
+        if(!(state==undefined))
+		blog.state = state;
+        if(!(tags==undefined))
+		blog.tags = tags;
+        
 
-    if (!(req.body.body=="")) {
-        blog.body =req.body.body
-        //await blog.save()
-       // return res.send({status:true,message})
-    }
-    
-    if(!(req.body.tags =="")){
-        blog.tags = req.body.tags
-    }
+		blog.last_updated = moment().toDate();
 
-    if(!(req.body.title =="")){
-        blog.title = req.body.title
-    }
-
-    if(!(req.body.description =="")){
-        blog.description = req.body.description
-    }
-    
-
-    
-
-    await blog.save()
-
-    return res.json({ status: true, message:"blog edited successfully" })
+		blog
+			.save()
+			.then(() => res.status(200).json({ status: true, blog }))
+			.catch((err) => res.send({ status: 500, errDesc: err, message: err._message }));
+	} catch (err) {console.log(err)
+		res.json({ status: 500, errDesc: err, message: "An error occurred, please try again later." });
+	}
 }

@@ -9,19 +9,19 @@ const blogController =require("../controllers/blogController")
 
 
 
-blogRouter.post("/create",blogController.createBlog)
+blogRouter.post("/create",blogController.createBlog)//works
 
-blogRouter.delete("/delete/:id",blogController.deleteBlog)
+blogRouter.delete("/delete/:id",blogController.deleteBlog)//works
 
-blogRouter.post("/mine",blogController.getAllMyBlogs)
+blogRouter.get("/getmyblogs",blogController.getMyBlogs)//works
 
-blogRouter.post("/publish/:id",blogController.publishBlog)
+blogRouter.patch("/publish/:blog_id",blogController.updateState)//works
 
-blogRouter.patch("/edit/:id",blogController.editBlog)
+blogRouter.put("/edit/:blog_id",blogController.editBlog)
 
-blogRouter.post("/published",blogController.getPublishedBlogs)
+blogRouter.post("/published",blogController.getPublishedBlogs)//works but is index.js
 
-blogRouter.get("/published/:id",blogController.getAPublishedBlog)
+blogRouter.get("/published/:id",blogController.getAPublishedBlog)//works but its in the index.js
 
 
 

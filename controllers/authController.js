@@ -69,7 +69,7 @@ exports.login = async(req,res)=>{
         console.log(payload)
         const token =jwt.sign({
             payload:payload
-          },process.env.JWT_SECRET, { expiresIn: '1h' });
+          },process.env.JWT_SECRET, { expiresIn: '1d' });
           return res.status(200).send({
             success:true,
             message:"logged in successfuly",
