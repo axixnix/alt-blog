@@ -93,6 +93,8 @@ exports.getMyBlogs = async (req, res) =>{
         });
         if(count2==0){return res.status(422).send({message:`you have 0 blogs in record `})}
 		return res.status(200).json({ status: true, blogs });
+
+        
 	} catch (err) {
 		res.send({ status: 500, errDesc: err, message: "An error occurred, please try again." });
 	}
@@ -103,7 +105,7 @@ exports.getMyBlogs = async (req, res) =>{
 //console.log(res.locals.userId)
 //}
 
-exports.updateState = async function publish(req, res, next) {
+exports.updateState = async function publish(req, res) {
 	try {
 		const { blog_id } = req.params;
 		const user_id = req.user.id;
@@ -174,9 +176,21 @@ exports.getAPublishedBlog = async (req,res)=>{
 
 
 exports.deleteBlog = async (req, res) => {
-    const  id  = req.params.id
+    //const id = mongoose.Types.ObjectId(req.params.id.trim())
+    //const  id  = String(req.params.id)
+    const id =(req.params.id).trim()
+    console.log("type of req.params.id : "+typeof req.params.id)
+    console.log(" req.params.id : "+ req.params.id)
+
     const user_id = req.user.id
-    check = await BlogModel.findById(id)
+    check = await BlogModel.findById({_id:id})/* , function (err, docs) {
+        if (err){
+            console.log(err);
+        }
+        else{
+            console.log("Result : ", docs);
+        }
+    });
     console.log(check)
     if(!check){
         return res.send({
@@ -185,7 +199,7 @@ exports.deleteBlog = async (req, res) => {
         
         })
     }
-    
+     */
     const creator_id = check.creator_id
     console.log(creator_id==user_id)
     console.log("blog id from request  "+id)
@@ -238,4 +252,44 @@ exports.editBlog = async function updateArticle(req, res) {
 	} catch (err) {console.log(err)
 		res.json({ status: 500, errDesc: err, message: "An error occurred, please try again later." });
 	}
+}
+
+exports.userGetOne = async (req, res) => {
+    //const  blog_id  = (req.params.blog_id).trim()
+    const  blog_id = new mongoose.Types.ObjectId(req.params.blog_id)
+    console.log("this is blog_id : "+blog_id)
+    console.log("this is typeof blog_id : "+ typeof blog_id)
+    const user_id = req.user.id
+    let check
+    /* blog = await BlogModel.findById(blog_id).then(data=>{
+        check = data.length
+        console.log("data length : "+data.length)
+
+        return data
+    }) */
+    const blog = await BlogModel.findById(blog_id).then(data=>{
+        check = data.length//data.length()
+        console.log("this is data : "+data)
+        console.log("this is check : "+check)
+        return data
+    });
+    console.log(blog)
+    if(!(blog)){
+        return res.send({
+            success:false,
+            message:`id:${blog_id} does not match any blog in our records`,
+        
+        })
+    }
+    
+    const creator_id = blog.creator_id
+    if( (creator_id==user_id)){//check && (creator_id==user_id)){
+    
+    return res.json({ status: true, message:"found your blog",blog:blog })
+    }
+    if(  !((check.creator_id===user_id))){//check &&  !((check.creator_id===user_id))){
+        
+        return res.json({ status: false, message:"unauthorized" })
+        }
+    
 }
