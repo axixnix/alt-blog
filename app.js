@@ -17,6 +17,14 @@ app.get('/',(req,res)=>{
     res.send('hello blog')
 })
 
+//Error handler middleware
+app.use((err,req,res,next)=>{
+    console.log(err)
+    const errorStatus = err.status || 500
+    res.status(errorStatus).send("an error occured")
+    next()
+})
+
 
 app.listen(CONFIG.PORT,()=>{
     console.log(`server started on http://localhost:${CONFIG.PORT}`)
