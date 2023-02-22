@@ -5,6 +5,9 @@ const connectToDb = require("./db/mongodb")
 
 const app = express()
 
+//Routes
+const blogRouter = require("./routes/blogRouter")
+
 //Connect to mongodb
 connectToDb()
 
@@ -12,6 +15,8 @@ connectToDb()
 //Add Middleware
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
+
+app.use("/blogs",blogRouter)
 
 app.get('/',(req,res)=>{
     res.send('hello blog')
