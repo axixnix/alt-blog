@@ -32,4 +32,3 @@ blogRouter.get("/published/:id",blogController.getAPublishedBlog)//works but its
 
 
 module.exports =blogRouter
-Footer

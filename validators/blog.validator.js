@@ -1,39 +1,39 @@
-const joi = require("joi")
+const Joi = require("joi")
 
 const BlogSchema = Joi.object({
-    title: joi.string()
+    title: Joi.string()
               .min(5)
               .max(255)
               .trim()
               .required(),
 
-    description: joi.string()
+    description: Joi.string()
                     .min(5)
                     .max(500)
                     .trim()
                     .required(),
    
-    tags:       joi.array().items(joi.string())
-                .trim()
+    tags:       Joi.array().items(Joi.string().trim())
+                
                 .optional(),
                 
-    created_at : joi.date()
+    created_at : Joi.date()
                 .default(Date.now),
 
-    last_updated : joi.date()
+    last_updated : Joi.date()
                 .default(Date.now),            
 
-    author: joi.string()
+    author: Joi.string()
                .min(2) 
                .trim() 
                .required(),          
     
 
-    body: joi.string()
+    body: Joi.string()
              .min(10)
              .required(),
 
-    reading_time: joi.string()
+    reading_time: Joi.string()
              .min(10)
              .required()         
              
