@@ -7,22 +7,23 @@ const  mongoose =require("mongoose")
 
 
 exports.createBlog = async (req,res)=>{
-    const user = await UserModel.findOne({_id:req.user.id}).then(data=>{
+    /*const user = await UserModel.findOne({_id:req.user.email}).then(data=>{
                 
         count = data.length
         return data
-    })
+    })*/
+    const count =1
     if(count==0||undefined){
         
         return res.status(400).send({message:"this action can only be performed by registered users"})}
     console.log("blog creator user count "+count)
         const blog = await  BlogModel.create({
-       creator_id:user._id,
+       creator_id:1,//user._id,
         created_at:moment().toDate(),
         title:req.body.title,
         description:req.body.description,
         tags:req.body.tags,
-        author:user.first_name+" "+user.last_name,
+        author:"first author",//req.body.author,//user.first_name+" "+user.last_name,
         state:"draft",
         read_count:0,
         reading_time:`this is a ${req.body.reading_time} minute read`,
@@ -51,7 +52,7 @@ exports.getPublishedBlogs = async (req,res)=>{
     const Limit = req.body.limit || 20
     const Skip = req.body.skip || 0
     
-        const published = await BlogModel.find({state:"published"},{body:0}).limit(Limit).skip(Skip)
+        const published = await BlogModel.find({state:"draft"},{body:0}).limit(Limit).skip(Skip)
         res.send({
             success:true,
             message:" published blogs retrieved successfully",

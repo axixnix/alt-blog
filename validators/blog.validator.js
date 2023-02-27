@@ -23,19 +23,18 @@ const BlogSchema = Joi.object({
     last_updated : Joi.date()
                 .default(Date.now),            
 
-    author: Joi.string()
-               .min(2) 
-               .trim() 
-               .required(),          
+             
     
 
     body: Joi.string()
              .min(10)
              .required(),
 
-    reading_time: Joi.string()
-             .min(10)
-             .required()         
+    reading_time: Joi.number()
+    .integer()
+    .min(1)
+    .max(60)
+    .required()         
              
 
 })
@@ -48,7 +47,8 @@ async function BlogValidation(req,res,next){
         next()
         
     } catch (error) {
-        next(error.details[0].message)
+        next({message:error.details[0].message,
+        status:406})
         
     }
 }
