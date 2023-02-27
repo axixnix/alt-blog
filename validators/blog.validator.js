@@ -1,6 +1,6 @@
 const Joi = require("joi")
 
-const BlogSchema = Joi.object({
+const BlogAddSchema = Joi.object({
     title: Joi.string()
               .min(5)
               .max(255)
@@ -39,19 +39,72 @@ const BlogSchema = Joi.object({
 
 })
 
-async function BlogValidation(req,res,next){
+const BlogUpdateSchema = Joi.object({
+    title: Joi.string()
+              .min(5)
+              .max(255)
+              .trim()
+              ,
+
+    description: Joi.string()
+                    .min(5)
+                    .max(500)
+                    .trim()
+                    ,
+   
+    tags:       Joi.array().items(Joi.string().trim())
+                
+                .optional(),
+                
+    created_at : Joi.date()
+                .default(Date.now),
+
+    last_updated : Joi.date()
+                .default(Date.now),            
+
+             
+    
+
+    body: Joi.string()
+             .min(10)
+             ,
+
+    reading_time: Joi.number()
+    .integer()
+    .min(1)
+    .max(60)
+             
+             
+
+})
+
+async function AddBlogValidationMW(req,res,next){
     const blogPayload =req.body
 
     try {
-        await BlogSchema.validateAsync(blogPayload)
+        await BlogAddSchema.validateAsync(blogPayload)
         next()
         
     } catch (error) {
         next({message:error.details[0].message,
-        status:406})
+        status:400})
+        
+    }
+}
+
+async function UpdateBlogValidationMW(req,res,next){
+    const blogPayload =req.body
+
+    try {
+        await BlogUpdateSchema.validateAsync(blogPayload)
+        next()
+        
+    } catch (error) {
+        next({message:error.details[0].message,
+        status:400})
         
     }
 }
 
 
-module.exports = BlogValidation
+module.exports = {AddBlogValidationMW,UpdateBlogValidationMW}

@@ -1,7 +1,7 @@
 const express = require("express")
 const blogRouter = express.Router()
 const blogController =require("../controllers/blogController")
-const BlogValidation = require("../validators/blog.validator")
+const {AddBlogValidationMW,UpdateBlogValidationMW} = require("../validators/blog.validator")
 
 
 
@@ -10,7 +10,7 @@ const BlogValidation = require("../validators/blog.validator")
 
 
 
-blogRouter.post("/create",BlogValidation,blogController.createBlog)//works
+blogRouter.post("/create",AddBlogValidationMW,blogController.createBlog)//works
 
 blogRouter.delete("/delete/:id",blogController.deleteBlog)//works
 
@@ -20,7 +20,7 @@ blogRouter.get("/getmyblog/:blog_id",blogController.userGetOne)
 
 blogRouter.patch("/updatestate/:blog_id",blogController.updateState)//works
 
-blogRouter.put("/edit/:blog_id",blogController.editBlog)
+blogRouter.put("/edit/:blog_id",UpdateBlogValidationMW,blogController.editBlog)
 
 blogRouter.post("/published",blogController.getPublishedBlogs)//works but is index.js
 

@@ -221,17 +221,17 @@ exports.editBlog = async function updateArticle(req, res) {
 	try {console.log("req.params.id :"+(req.params.blog_id))
 		const  blog_id  = req.params.blog_id;
         console.log("blog_id :"+blog_id)
-		const user_id = req.user.id;
-		const { title, description, body, state, tags } = req.body;
+		//const user_id = req.user.id;
+		const { title, description, body, state, tags,reading_time } = req.body;
 		const blog = await BlogModel.findById(blog_id);
 
 		if (!blog) {
 			return res.status(404).json({ status: false, message: `Can not find blog with ID: ${blog_id}` });
 		}
 
-		if (user_id !== blog.creator_id) {
+		/*if (user_id !== blog.creator_id) {
 			return res.status(401).json({ status: false, message: "You are not authorized to edit this blog." });
-		}
+		}*/
         //console.log("state frome destructuring :"+state)
         if(!(title==undefined))
 		blog.title = title;
@@ -243,6 +243,8 @@ exports.editBlog = async function updateArticle(req, res) {
 		blog.state = state;
         if(!(tags==undefined))
 		blog.tags = tags;
+        if(!(reading_time==undefined))
+		blog.reading_time = reading_time;
         
 
 		blog.last_updated = moment().toDate();
@@ -252,7 +254,7 @@ exports.editBlog = async function updateArticle(req, res) {
 			.then(() => res.status(200).json({ status: true, blog }))
 			.catch((err) => res.send({ status: 500, errDesc: err, message: err._message }));
 	} catch (err) {console.log(err)
-		res.json({ status: 500, errDesc: err, message: "An error occurred, please try again later." });
+		res.json({ status: 500, errDesc: err, message: "An error occu, please try again later." });
 	}
 }
 
