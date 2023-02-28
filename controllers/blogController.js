@@ -52,7 +52,7 @@ exports.getPublishedBlogs = async (req,res)=>{
     const Limit = req.body.limit || 20
     const Skip = req.body.skip || 0
     
-        const published = await BlogModel.find({state:"draft"},{body:0}).limit(Limit).skip(Skip)
+        const published = await BlogModel.find({state:"published"},{body:0}).limit(Limit).skip(Skip)
         res.send({
             success:true,
             message:" published blogs retrieved successfully",
@@ -107,10 +107,10 @@ exports.getMyBlogs = async (req, res) =>{
 //console.log(res.locals.userId)
 //}
 
-exports.updateState = async function publish(req, res) {
+exports.updateState = async function publish(req, res,next) {
 	try {
 		const { blog_id } = req.params;
-		const user_id = req.user.id;
+		//const user_id = req.user.id;
 		const body = req.body;
 		const blog = await BlogModel.findById(blog_id,{body:0});
 
@@ -118,9 +118,9 @@ exports.updateState = async function publish(req, res) {
 			return res.status(404).json({ status: false, message: `Can not find blog with ID: ${blog_id}` });
 		}
 
-		if (user_id !== blog.creator_id) {
+	/*	if (user_id !== blog.creator_id) {
 			return res.status(401).json({ status: false, message: "You are not authorized to edit this blog." });
-		}
+		}*/
         if(body.state=="draft"||"published"){
 		blog.state = body.state;
 		blog
@@ -151,6 +151,7 @@ exports.getAPublishedBlog = async (req,res)=>{
     }
     if(blog.state==="draft"){
         return res.send({
+            status:400,
             success:false,
             message:`user unauthorized to access this blog`,
         

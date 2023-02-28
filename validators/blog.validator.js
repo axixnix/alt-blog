@@ -78,6 +78,16 @@ const BlogUpdateSchema = Joi.object({
 
 })
 
+const StateUpdateSchema = Joi.object({
+    state: Joi.string().valid("published","draft")
+              
+            
+             
+             
+
+})
+
+
 async function AddBlogValidationMW(req,res,next){
     const blogPayload =req.body
 
@@ -106,5 +116,20 @@ async function UpdateBlogValidationMW(req,res,next){
     }
 }
 
+async function StateValidationMW(req,res,next){
+    const blogPayload =req.body
 
-module.exports = {AddBlogValidationMW,UpdateBlogValidationMW}
+    try {
+        await StateUpdateSchema.validateAsync(blogPayload)
+        next()
+        
+    } catch (error) {
+        next({message:error.details[0].message,
+        status:400})
+        
+    }
+}
+
+
+
+module.exports = {AddBlogValidationMW,UpdateBlogValidationMW,StateValidationMW}
