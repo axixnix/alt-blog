@@ -185,7 +185,7 @@ exports.deleteBlog = async (req, res) => {
     console.log("type of req.params.id : "+typeof req.params.id)
     console.log(" req.params.id : "+ req.params.id)
 
-    const user_id = req.user.id
+    //const user_id = req.user.id
     check = await BlogModel.findById({_id:id})/* , function (err, docs) {
         if (err){
             console.log(err);
@@ -203,18 +203,18 @@ exports.deleteBlog = async (req, res) => {
         })
     }
      */
-    const creator_id = check.creator_id
-    console.log(creator_id==user_id)
-    console.log("blog id from request  "+id)
-    if(check && (creator_id==user_id)){
+    //const creator_id = check.creator_id
+    //console.log(creator_id==user_id)
+    //console.log("blog id from request  "+id)
+   //if(check && (creator_id==user_id)){
     const blog = await BlogModel.deleteOne({ _id: id})
     return res.json({ status: true, message:"blog has been deleted",blog:blog })
-    }
-    if(check &&  !((check.creator_id===user_id))){
+   // }
+   /* if(check &&  !((check.creator_id===user_id))){
         
         return res.json({ status: false, message:"unauthorized" })
         }
-    
+    */
 }
 
 

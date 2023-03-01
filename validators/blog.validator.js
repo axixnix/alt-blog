@@ -79,7 +79,7 @@ const BlogUpdateSchema = Joi.object({
 })
 
 const StateUpdateSchema = Joi.object({
-    state: Joi.string().valid("published","draft")
+    state: Joi.string().valid("published","draft")//enum values
               
             
              
